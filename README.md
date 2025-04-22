@@ -37,17 +37,29 @@ Este projeto fullstack tem como objetivo permitir que usuários realizem o cadas
 # 📁 Estrutura do Projeto
 
 projeto/
+
 ├── backend/           → API Spring Boot com MySQL
+
 │   ├── src/
+
 │   ├── pom.xml
+
 │   └── docker-compose.yml
+
 │
+
 ├── frontend/          → Interface em React.js
+
 │   ├── src/
+
 │   ├── public/
+
 │   ├── package.json
+
 │   └── logo.png        → Nova logo personalizada
+
 │
+
 └── README.md          → Este documento principal
 
 
