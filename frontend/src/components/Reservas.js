@@ -51,9 +51,9 @@ function Reservas() {
     setNovaReserva({ ...novaReserva, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
+  
     const payload = {
       cliente: { id: parseInt(novaReserva.clienteId) },
       locacao: { id: parseInt(novaReserva.locacaoId) },
@@ -62,17 +62,23 @@ function Reservas() {
       valorFinal: parseFloat(novaReserva.valorFinal),
       situacao: novaReserva.situacao
     };
-
+  
     const method = idEditando ? 'PUT' : 'POST';
     const url = idEditando ? `${apiUrl}/${idEditando}` : apiUrl;
-
+  
     fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
       .then(res => {
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
+        if (!res.ok) {
+          if (res.status === 409) {
+            throw new Error('CONFLITO_RESERVA');
+          } else {
+            throw new Error(`Erro ${res.status}`);
+          }
+        }
         return fetch(apiUrl);
       })
       .then(res => res.json())
@@ -90,10 +96,15 @@ function Reservas() {
         setIdEditando(null);
       })
       .catch(err => {
-        toast.error("Erro ao salvar reserva");
-        console.error(err);
+        if (err.message === 'CONFLITO_RESERVA') {
+          toast.error("Já existe uma reserva nesse horário para essa locação.");
+        } else {
+          toast.error("Erro ao salvar reserva.");
+          console.error(err);
+        }
       });
   };
+  
 
   const editarReserva = (reserva) => {
     setNovaReserva({

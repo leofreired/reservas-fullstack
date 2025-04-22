@@ -34,8 +34,11 @@ function Clientes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(cliente)
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao salvar cliente");
+      .then(async res => {
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || "Erro ao salvar cliente");
+        }
         return fetch(apiUrl);
       })
       .then(res => res.json())
@@ -46,9 +49,13 @@ function Clientes() {
         setIdEditando(null);
       })
       .catch(err => {
-        toast.error("Erro ao salvar cliente");
+        if (err.message.includes("CPF já cadastrado")) {
+          toast.error("CPF já cadastrado!");
+        } else {
+          toast.error("Erro ao salvar cliente.");
+        }
         console.error(err);
-      });
+      });          
   };
 
   const editarCliente = (c) => {
@@ -69,9 +76,7 @@ function Clientes() {
   const deletarCliente = (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
 
-    fetch(`${apiUrl}/${id}`, {
-      method: 'DELETE'
-    })
+    fetch(`${apiUrl}/${id}`, { method: 'DELETE' })
       .then(() => fetch(apiUrl))
       .then(res => res.json())
       .then(data => {
